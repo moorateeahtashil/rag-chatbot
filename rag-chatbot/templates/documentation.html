@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Application Documentation</h1>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Introduction</h5>
+            </div>
+            <div class="card-body">
+                <p>This is a production-ready, containerized RAG (Retrieval-Augmented Generation) chatbot application. It uses a sophisticated architecture to provide answers to user questions based on a provided knowledge base. The entire system is built with Python and FastAPI, and includes a full web interface for interaction and configuration.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Tech Stack</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Python:</b> The core programming language.</li>
+                    <li class="list-group-item"><b>FastAPI:</b> A high-performance web framework for building the API and serving the web UI.</li>
+                    <li class="list-group-item"><b>Pinecone:</b> A managed vector database for efficient similarity search on document embeddings.</li>
+                    <li class="list-group-item"><b>Sentence Transformers:</b> Used to convert text documents and user queries into numerical vector embeddings.</li>
+                    <li class="list-group-item"><b>Hugging Face Transformers:</b> Used to run the local language model (Flan-T5-base) that generates answers.</li>
+                    <li class="list-group-item"><b>Docker & Docker Compose:</b> For containerizing the application and managing its services, ensuring a consistent environment for development and production.</li>
+                    <li class="list-group-item"><b>AdminKit:</b> A Bootstrap 5-based template for the web user interface.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Architecture Deep Dive</h5>
+            </div>
+            <div class="card-body">
+                <h6>Data Flow</h6>
+                <p>When a user asks a question, the following sequence of events occurs:</p>
+                <ol>
+                    <li><b>User Query:</b> A user sends a question through the UI or the API.</li>
+                    <li><b>Embedding:</b> The user's query is converted into a vector embedding using the Sentence Transformer model.</li>
+                    <li><b>Vector Search:</b> This query vector is sent to the Pinecone index, which performs a similarity search to find the most relevant text chunks from the knowledge base.</li>
+                    <li><b>Prompt Augmentation:</b> The retrieved text chunks (context) are combined with the original user query into a detailed prompt, instructing the language model on how to answer.</li>
+                    <li><b>Answer Generation:</b> The augmented prompt is sent to the generator LLM (Flan-T5-base), which synthesizes a final, coherent answer based on the provided context.</li>
+                    <li><b>Response:</b> The generated answer is sent back to the user.</li>
+                </ol>
+                <hr>
+                <h6>Project Structure</h6>
+                <p>The project is organized into a modular structure for clarity and scalability:</p>
+                <ul>
+                    <li><code>/app</code>: Contains the main FastAPI application code.</li>
+                    <li><code>/app/api</code>: Defines the API endpoints (e.g., <code>/chat</code>).</li>
+                    <li><code>/app/core</code>: Core services like configuration management and logging.</li>
+                    <li><code>/app/services</code>: The core business logic, including the RAG service and Vector DB service.</li>
+                    <li><code>/configs</code>: Domain-specific configurations in YAML format.</li>
+                    <li><code>/data</code>: Directory to store the source documents for ingestion.</li>
+                    <li><code>/scripts</code>: Standalone scripts, most importantly the data ingestion script.</li>
+                    <li><code>/templates</code>: HTML templates for the web UI.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Connecting to the App</h5>
+            </div>
+            <div class="card-body">
+                <h6>Web Interface</h6>
+                <p>The primary way to interact with the application is through this web interface. The sidebar on the left allows you to navigate between the Documentation, the interactive Chatbot, and the Settings page.</p>
+                <h6>API Connection</h6>
+                <p>You can also interact with the application programmatically via its REST API. The main endpoint is <code>/api/v1/chat</code>. You can find a fully interactive API documentation (Swagger UI) at <a href="/docs" target="_blank">/docs</a>.</p>
+                <p>Here is an example of how to connect using cURL:</p>
+                <pre><code>curl -X POST "http://localhost:8000/api/v1/chat" \
+-H "Content-Type: application/json" \
+-d '{
+  "query": "What is RAG?"
+}'</code></pre>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

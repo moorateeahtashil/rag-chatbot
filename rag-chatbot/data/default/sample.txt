@@ -1,0 +1,87 @@
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+
+RAG is often compared to fine-tuning, another popular method for customizing LLMs. 
+- **Fine-tuning** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+- **RAG** is more flexible. It doesn't change the LLM itself. Instead, it provides the LLM with external knowledge at runtime. This makes it easier and cheaper to update the knowledge base; you simply update the documents in the vector database.
+
+## Section 2: Architecture of This Application
+
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+
+-   `/app`: Contains the main FastAPI application code.
+-   `/app/api`: Defines the API endpoints.
+-   `/app/core`: Core services like configuration management.
+-   `/app/services`: Business logic, including the RAG service and Vector DB service.
+-   `/configs`: Domain-specific configurations in YAML format.
+-   `/data`: Directory to store the source documents for ingestion.
+-   `/scripts`: Standalone scripts, like the data ingestion script.
+-   `/templates`: HTML templates for the web UI.
+-   `Dockerfile`: Instructions to build the production Docker image.
+-   `docker-compose.yml`: Defines the services for running the application with Docker Compose.
+
+## Section 3: How to Use This System
+
+This application provides a web-based user interface for easy interaction.
+
+### The Admin Panel
+
+The admin panel is the main interface for the application, accessible at the root URL (`/`). It has three main pages:
+
+1.  **Documentation Page:** This is the page you are currently reading about. It provides all the necessary information about the application.
+2.  **Chatbot Page:** This page provides a real-time chat interface to interact with the RAG chatbot. You can ask questions, and the chatbot will use the information in this document to provide answers.
+3.  **Settings Page:** This page allows you to configure the application's environment variables, such as the API keys and settings for the Pinecone database. After changing the settings, you need to restart the application for the changes to take effect.
+
+### Adding New Data
+
+To add new knowledge to the chatbot, you can add new text files to the `/data/default` directory. After adding the files, you need to rebuild the Docker container to run the ingestion script again:
+
+```bash
+docker-compose up --build
+```
+
+## Section 4: Customization and Extension
+
+### Adding a New Domain
+
+You can create a new domain for a different set of documents. 
+1.  Create a new data folder, e.g., `/data/new_domain`.
+2.  Create a new configuration file, e.g., `/configs/new_domain_domain.yaml`, and specify the new index name and data path.
+3.  Run the ingestion script for the new domain: `docker-compose run --rm rag-chatbot-api python scripts/ingest_data.py --domain new_domain` (This assumes you modify the script to accept the domain argument again).
+4.  In the chatbot UI or API, specify the new domain in your request.
+
+### Changing the Models
+
+You can change the embedding model or the generator LLM in the `app/services/vector_db.py` and `app/services/rag_service.py` files, respectively. Remember to update the `requirements.txt` file if you use new libraries.
+
+## Section 5: Troubleshooting
+
+-   **401 Unauthorized Error during ingestion:** Your Pinecone API key is likely incorrect. Check the `.env` file and the Settings page.
+-   **404 Not Found Error on chat:** The index name in your domain config might be incorrect or the index was not created successfully. Check the logs from the build process.
+-   **Bad or irrelevant answers:** This is likely due to the quality or relevance of the data in your vector database. Try adding more detailed and specific documents.

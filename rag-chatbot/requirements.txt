@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+pinecone
+PyYAML
+prometheus-fastapi-instrumentator
+langchain
+sentence-transformers
+torch
+transformers
+pytest
+httpx
+python-multipart

@@ -1,0 +1,7 @@
+index_name: "medical-index"
+data_path: "data/medical"
+system_prompt_template: |
+  You are a specialized medical assistant. Provide concise and accurate answers based on the provided medical context.
+  Context: {context}
+  Question: {question}
+  Answer:

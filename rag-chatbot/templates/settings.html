@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Settings</h1>
+
+{% if message %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Environment Variables</h5>
+            </div>
+            <div class="card-body">
+                <form action="/settings" method="post">
+                    <div class="mb-3">
+                        <label for="pinecone_api_key" class="form-label">Pinecone API Key</label>
+                        <input type="password" class="form-control" id="pinecone_api_key" name="pinecone_api_key" value="{{ settings.get('PINECONE_API_KEY', '') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pinecone_cloud" class="form-label">Pinecone Cloud</label>
+                        <input type="text" class="form-control" id="pinecone_cloud" name="pinecone_cloud" value="{{ settings.get('PINECONE_CLOUD', '') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pinecone_region" class="form-label">Pinecone Region</label>
+                        <input type="text" class="form-control" id="pinecone_region" name="pinecone_region" value="{{ settings.get('PINECONE_REGION', '') }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

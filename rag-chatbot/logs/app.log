@@ -1,0 +1,462 @@
+2025-08-18 07:08:12,082 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:08:12,083 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:08:18,416 - app.services.rag_service - INFO - Received query: 'a better definition' for domain: 'default'
+2025-08-18 07:08:18,416 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:08:19,707 - app.services.rag_service - INFO - Retrieved 5 context chunks.
+2025-08-18 07:08:19,708 - app.services.rag_service - INFO - First retrieved chunk: 2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RA...
+2025-08-18 07:08:19,709 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Given the context below, please answer the question. If the context does not contain the answer, say "I am sorry, I don't have enough information to answer that question."
+
+Context:
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+### RAG vs. Fine-Tuning
+
+RAG is often compared to fine-tuning, another popular method for customizing LLMs. 
+- **Fine-tuning** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+- **RAG** is more flexible. It doesn't change the LLM itself. Instead, it provides the LLM with external knowledge at runtime. This makes it easier and cheaper to update the knowledge base; you simply update the documents in the vector database.
+
+## Section 2: Architecture of This Application
+
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+---
+To add new knowledge to the chatbot, you can add new text files to the `/data/default` directory. After adding the files, you need to rebuild the Docker container to run the ingestion script again:
+
+```bash
+docker-compose up --build
+```
+
+## Section 4: Customization and Extension
+
+### Adding a New Domain
+
+You can create a new domain for a different set of documents. 
+1.  Create a new data folder, e.g., `/data/new_domain`.
+2.  Create a new configuration file, e.g., `/configs/new_domain_domain.yaml`, and specify the new index name and data path.
+3.  Run the ingestion script for the new domain: `docker-compose run --rm rag-chatbot-api python scripts/ingest_data.py --domain new_domain` (This assumes you modify the script to accept the domain argument again).
+4.  In the chatbot UI or API, specify the new domain in your request.
+
+### Changing the Models
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+---
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+
+Question: a better definition
+
+Answer:
+
+2025-08-18 07:08:22,924 - app.services.rag_service - INFO - Generated answer: I don't have enough information to answer that
+2025-08-18 07:10:58,847 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:10:58,847 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:11:43,064 - app.services.rag_service - INFO - Received query: 'What is Retrieval-Augmented Generation?' for domain: 'default'
+2025-08-18 07:11:43,070 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:11:45,139 - app.services.rag_service - INFO - Retrieved 5 context chunks.
+2025-08-18 07:11:45,140 - app.services.rag_service - INFO - First retrieved chunk: # Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section ...
+2025-08-18 07:11:45,141 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a synthesis of the provided context. Be detailed and informative.
+
+Context:
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+---
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+
+Question: What is Retrieval-Augmented Generation?
+
+Answer:
+
+2025-08-18 07:11:48,602 - app.services.rag_service - INFO - Generated answer: an advanced technique for building chatbots and other natural language processing systems.
+2025-08-18 07:13:16,971 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:13:16,972 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:13:24,009 - app.services.rag_service - INFO - Received query: 'Compare RAG vs Fine-tuning' for domain: 'default'
+2025-08-18 07:13:24,009 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:13:25,531 - app.services.rag_service - INFO - Retrieved 5 context chunks.
+2025-08-18 07:13:25,532 - app.services.rag_service - INFO - First retrieved chunk: 2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RA...
+2025-08-18 07:13:25,533 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a synthesis of the provided context. Be detailed and informative.
+
+Context:
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+### RAG vs. Fine-Tuning
+
+RAG is often compared to fine-tuning, another popular method for customizing LLMs. 
+- **Fine-tuning** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+- **RAG** is more flexible. It doesn't change the LLM itself. Instead, it provides the LLM with external knowledge at runtime. This makes it easier and cheaper to update the knowledge base; you simply update the documents in the vector database.
+
+## Section 2: Architecture of This Application
+
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+---
+### RAG vs. Fine-Tuning
+
+RAG is often compared to fine-tuning, another popular method for customizing LLMs. 
+- **Fine-tuning** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+- **RAG** is more flexible. It doesn't change the LLM itself. Instead, it provides the LLM with external knowledge at runtime. This makes it easier and cheaper to update the knowledge base; you simply update the documents in the vector database.
+
+## Section 2: Architecture of This Application
+
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+
+Question: Compare RAG vs Fine-tuning
+
+Answer:
+
+2025-08-18 07:13:31,361 - app.services.rag_service - INFO - Generated answer: **RAG** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+2025-08-18 07:15:21,289 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:15:21,291 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:15:27,693 - app.services.rag_service - INFO - Received query: 'Explain the architecture of this application' for domain: 'default'
+2025-08-18 07:15:27,693 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:15:28,930 - app.services.rag_service - INFO - Retrieved 5 context chunks.
+2025-08-18 07:15:28,931 - app.services.rag_service - INFO - First retrieved chunk: ### Project Structure Details
+
+-   `/app`: Contains the main FastAPI application code.
+-   `/app/api`: Defines the API endpoints.
+-   `/app/core`: Core services like configuration management.
+-   `/app/services`: Business logic, including the RAG ser...
+2025-08-18 07:15:28,932 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a synthesis of the provided context. Be detailed and informative.
+
+Context:
+### Project Structure Details
+
+-   `/app`: Contains the main FastAPI application code.
+-   `/app/api`: Defines the API endpoints.
+-   `/app/core`: Core services like configuration management.
+-   `/app/services`: Business logic, including the RAG service and Vector DB service.
+-   `/configs`: Domain-specific configurations in YAML format.
+-   `/data`: Directory to store the source documents for ingestion.
+-   `/scripts`: Standalone scripts, like the data ingestion script.
+-   `/templates`: HTML templates for the web UI.
+-   `Dockerfile`: Instructions to build the production Docker image.
+-   `docker-compose.yml`: Defines the services for running the application with Docker Compose.
+
+## Section 3: How to Use This System
+
+This application provides a web-based user interface for easy interaction.
+
+### The Admin Panel
+
+The admin panel is the main interface for the application, accessible at the root URL (`/`). It has three main pages:
+---
+### Project Structure Details
+
+-   `/app`: Contains the main FastAPI application code.
+-   `/app/api`: Defines the API endpoints.
+-   `/app/core`: Core services like configuration management.
+-   `/app/services`: Business logic, including the RAG service and Vector DB service.
+-   `/configs`: Domain-specific configurations in YAML format.
+-   `/data`: Directory to store the source documents for ingestion.
+-   `/scripts`: Standalone scripts, like the data ingestion script.
+-   `/templates`: HTML templates for the web UI.
+-   `Dockerfile`: Instructions to build the production Docker image.
+-   `docker-compose.yml`: Defines the services for running the application with Docker Compose.
+
+## Section 3: How to Use This System
+
+This application provides a web-based user interface for easy interaction.
+
+### The Admin Panel
+
+The admin panel is the main interface for the application, accessible at the root URL (`/`). It has three main pages:
+---
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+---
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+---
+### RAG vs. Fine-Tuning
+
+RAG is often compared to fine-tuning, another popular method for customizing LLMs. 
+- **Fine-tuning** adapts the internal parameters of an LLM on a specific dataset, teaching it new knowledge or a new style. It is computationally expensive and needs to be redone when the knowledge base changes.
+- **RAG** is more flexible. It doesn't change the LLM itself. Instead, it provides the LLM with external knowledge at runtime. This makes it easier and cheaper to update the knowledge base; you simply update the documents in the vector database.
+
+## Section 2: Architecture of This Application
+
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+Question: Explain the architecture of this application
+
+Answer:
+
+2025-08-18 07:15:35,457 - app.services.rag_service - INFO - Generated answer: A production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+2025-08-18 07:21:06,799 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:21:06,800 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:21:13,711 - app.services.rag_service - INFO - Received query: 'What is Retrieval-Augmented Generation?' for domain: 'default'
+2025-08-18 07:21:13,716 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:21:15,953 - app.services.rag_service - INFO - Retrieved 5 context chunks.
+2025-08-18 07:21:15,953 - app.services.rag_service - INFO - First retrieved chunk: # Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section ...
+2025-08-18 07:21:15,953 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a synthesis of the provided context. Be detailed and informative.
+
+Context:
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+---
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+2.  **The Generator:** This model is a large language model (LLM), like GPT or Flan-T5. It takes the user's question and the relevant information found by the retriever and "generates" a human-like, coherent answer.
+
+By combining these two models, RAG systems can provide answers that are not only fluent and conversational but also grounded in factual information from the provided documents, reducing the risk of making things up.
+
+### RAG vs. Fine-Tuning
+---
+This application is a production-ready RAG chatbot built with Python and FastAPI. It has a modular architecture that is designed to be scalable and configurable.
+
+### Data Flow
+
+1.  **User Query:** A user sends a question through the UI or the API.
+2.  **Embedding:** The user's query is converted into a vector embedding using a Sentence Transformer model.
+3.  **Vector Search:** This query vector is sent to Pinecone, which performs a similarity search to find the most relevant text chunks from the indexed documents.
+4.  **Prompt Augmentation:** The retrieved text chunks are combined with the original user query into a detailed prompt for the language model.
+5.  **Generation:** The augmented prompt is sent to the generator LLM (Flan-T5-small), which generates a final answer.
+6.  **Response:** The generated answer is sent back to the user.
+
+### Project Structure Details
+
+Question: What is Retrieval-Augmented Generation?
+
+Answer:
+
+2025-08-18 07:21:19,706 - app.services.rag_service - INFO - Generated answer: an advanced technique for building chatbots and other natural language processing systems.
+2025-08-18 07:29:15,590 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:29:15,591 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:30:00,081 - app.services.rag_service - INFO - Received query: 'What is Retrieval-Augmented Generation?' for domain: 'default'
+2025-08-18 07:30:00,088 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:30:02,859 - app.services.rag_service - INFO - Retrieved 3 context chunks.
+2025-08-18 07:30:02,860 - app.services.rag_service - INFO - First retrieved chunk: ## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two...
+2025-08-18 07:30:02,861 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a synthesis of the provided context. Be detailed and informative.
+
+Context:
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+
+Question: What is Retrieval-Augmented Generation?
+
+Answer:
+
+2025-08-18 07:30:05,073 - app.services.rag_service - INFO - Generated answer: an advanced technique for building chatbots and other natural language processing systems.
+2025-08-18 07:32:03,322 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-18 07:32:03,323 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-18 07:32:09,991 - app.services.rag_service - INFO - Received query: 'What is Retrieval-Augmented Generation?' for domain: 'default'
+2025-08-18 07:32:09,996 - app.services.rag_service - INFO - Querying index 'developer-quickstart-py' for relevant context...
+2025-08-18 07:32:11,810 - app.services.rag_service - INFO - Retrieved 3 context chunks.
+2025-08-18 07:32:11,812 - app.services.rag_service - INFO - First retrieved chunk: ## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two...
+2025-08-18 07:32:11,812 - app.services.rag_service - INFO - Constructed prompt for LLM: Instruction: Use the following pieces of context to answer the question at the end. Your answer should be a detailed and comprehensive synthesis of the provided context. Explain the key concepts and provide examples where possible.
+
+Context:
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+---
+# Welcome to the RAG Chatbot Documentation (Extended)
+
+This document provides a comprehensive overview of the RAG (Retrieval-Augmented Generation) Chatbot application. You can ask the chatbot questions about the content of this document.
+
+## Section 1: Understanding RAG
+
+### What is Retrieval-Augmented Generation (RAG)?
+
+Retrieval-Augmented Generation, or RAG, is an advanced technique for building chatbots and other natural language processing systems. It combines the strengths of two different AI models: a retriever and a generator.
+
+1.  **The Retriever:** This model is responsible for finding relevant information from a large database of documents. When you ask a question, the retriever searches through the documents and "retrieves" the chunks of text that are most likely to contain the answer. In this application, the retriever is a vector database powered by Pinecone.
+
+Question: What is Retrieval-Augmented Generation?
+
+Answer:
+
+2025-08-18 07:32:15,581 - app.services.rag_service - INFO - Generated answer: RAG is an advanced technique for building chatbots and other natural language processing systems.

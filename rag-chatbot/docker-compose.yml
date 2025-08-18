@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  rag-chatbot-api:
+    build:
+      context: .
+      secrets:
+        - pinecone_api_key
+        - pinecone_cloud
+        - pinecone_region
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+
+secrets:
+  pinecone_api_key:
+    environment: "PINECONE_API_KEY"
+  pinecone_cloud:
+    environment: "PINECONE_CLOUD"
+  pinecone_region:
+    environment: "PINECONE_REGION"
